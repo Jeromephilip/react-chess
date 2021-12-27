@@ -1,0 +1,19 @@
+#grid {
+    display: flex;
+    flex-wrap: wrap;
+    background-color: #f3ddb3;
+    width: 700px;
+    height: 700px;
+}
+
+#grid .square-light{
+    width: 87.5px;
+    height: 87.5px;
+    background-color: #f3ddb3;
+}
+
+#grid .square-dark{
+    width: 87.5px;
+    height: 87.5px;
+    background-color:#997246;
+}
