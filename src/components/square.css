@@ -1,0 +1,27 @@
+.square {
+      display: grid;
+      width: 87.5px;
+      height: 87.5px;
+      place-content: center;
+}
+
+.light {
+      background-color: #f3ddb3;
+}
+
+.dark {
+      background-color:#997246;
+}
+
+
+/* #grid .square-light{
+      width: 87.5px;
+      height: 87.5px;
+      background-color: #f3ddb3;
+  }
+  
+  #grid .square-dark{
+      width: 87.5px;
+      height: 87.5px;
+      background-color:#997246;
+  } */
