@@ -41,14 +41,28 @@ function Square(props) {
             return <div className={`square ${string}`}></div>
       } else if (props.y === 8) {
             var s = "assets/chess-pieces/" + important_pieces_black[props.x] + ".png"
-            return <div className={`square ${string}`}><img src={s}/></div>
+            return (
+                  <div className={`square ${string}`}>
+                        <div className='piece' style={{backgroundImage: `url(${s})`}}></div>
+                  </div>
+            )
       } else if (props.y === 7){
-            return <div className={`square ${string}`}><img src="assets/chess-pieces/Chess_pdt60.png"/></div>
+            return <div className={`square ${string}`}>
+                        <div className='piece' style={{backgroundImage: `url(assets/chess-pieces/Chess_pdt60.png)`}}></div>
+                  </div>
       } else if (props.y === 2) {
-            return <div className={`square ${string}`}><img src="assets/chess-pieces/Chess_plt60.png"/></div>
+            return (
+                  <div className={`square ${string}`}>
+                        <div className='piece' style={{backgroundImage: `url(assets/chess-pieces/Chess_plt60.png)`}}></div>
+                  </div>
+            )
       } else if (props.y === 1) {
             var s = "assets/chess-pieces/" + important_pieces_white[props.x] + ".png"
-            return <div className={`square ${string}`}><img src={s}/></div>
+            return (
+                  <div className={`square ${string}`}>
+                        <div className='piece' style={{backgroundImage: `url(${s})`}}></div>
+                  </div>
+            )
       } 
 }     
 
