@@ -1,7 +1,7 @@
 .square {
       display: grid;
-      width: 87.5px;
-      height: 87.5px;
+      width: 100px;
+      height: 100px;
       place-content: center;
 }
 

@@ -9,8 +9,6 @@
 }
 
 .board {
-  padding-top: 50px;
-  padding-bottom: 50px;
   display: grid;
   place-content: center;
   height: 100vh;

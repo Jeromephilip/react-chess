@@ -1,63 +1,159 @@
 import React from 'react';
-import { render } from 'react-dom';
-import './board.css'
-import Square from './square.js'
+import {useRef, useState} from 'react';
+// import { render } from 'react-dom';
+import './board.css';
+import Square from './square.js';
+import Game from  './../game/game';
 
-const rows = [8, 7, 6, 5, 4, 3, 2, 1];
-const cols = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+// const rows = [8, 7, 6, 5, 4, 3, 2, 1];
+// const cols = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
 const len = 8;
 
-var picked_piece = null
 
-function pick(e) {
-    var element = e.target
-    if (element.classList.contains("piece")) {
-        console.log("You have found a piece!")
-        element.style.position = "absolute";
-        var x = e.clientX - 50;
-        var y = e.clientY - 15;
-        element.style.left = `${x}px`;
-        element.style.top = `${y}px`
-        picked_piece = element
-    } 
+var piece_positions = []
 
+for (var i=0; i < 8; i++) {
+    piece_positions.push({color: "dark", piece: "pawn", image: "assets/chess-pieces/dark_pawn.png", x: i, y: 6})
 }
 
-function move(e) {
-    if (picked_piece) {
-        var x = e.clientX - 50;
-        var y = e.clientY - 15;
-        picked_piece.style.position = "absolute";
-        picked_piece.style.left = `${x}px`;
-        picked_piece.style.top = `${y}px`
-    }
-
+for (var m=0; m < 8; m++) {
+    piece_positions.push({color: "light",piece: "pawn", image: "assets/chess-pieces/light_pawn.png", x: m, y: 1})
 }
 
-function drop(e) {
-    if (picked_piece) {
-        picked_piece = null
-    }
+var color = "light";
+var row = 0;
+for (var k=0; k < 2; k++) {
+    piece_positions.push({color: `${color}`, piece: `rook`, image: `assets/chess-pieces/${color}_rook.png`, x: 0, y: row})
+    piece_positions.push({color: `${color}`, piece: `horse`, image: `assets/chess-pieces/${color}_horse.png`, x: 1, y: row})
+    piece_positions.push({color: `${color}`, piece: `bishop`, image: `assets/chess-pieces/${color}_bishop.png`, x: 2, y: row})
+    piece_positions.push({color: `${color}`, piece: `queen`, image: `assets/chess-pieces/${color}_queen.png`, x: 3, y: row})
+    piece_positions.push({color: `${color}`, piece: `king`, image: `assets/chess-pieces/${color}_king.png`, x: 4, y: row})
+    piece_positions.push({color: `${color}`, piece: `bishop`, image: `assets/chess-pieces/${color}_bishop.png`, x: 5, y: row})
+    piece_positions.push({color: `${color}`, piece: `horse`, image: `assets/chess-pieces/${color}_horse.png`, x: 6, y: row})
+    piece_positions.push({color: `${color}`, piece: `rook`, image: `assets/chess-pieces/${color}_rook.png`, x: 7, y: row})
+    color = "dark";
+    row = 7;
 }
+
+
 
 function Board() {
-    var grid = [];
-    // initialize board
-    var isWhite = false;
-    for (var i=0; i<len; i++) { // Number = ROW
-        for (var j=0; j<len; j++) { // Letter = COL
-            // let position = cols[j].concat("",rows[i].toString())
-            var n = i + j + 2;
-            grid.push(<Square key={`${j},${i}`} color={n} x={cols[j]} y={rows[i]}/>)
+    const [picked_piece, movePiece] = useState(null);
+    const [gridX, setGridX] = useState(0);
+    const [gridY, setGridY] = useState(0);
+    const [pieces, setPieces] = useState(piece_positions);
+    const board_ref = useRef(null);
+    const game = new Game();
+
+    function pick(e) {
+        var element = e.target
+        const chessboard = board_ref.current;
+        if (element.classList.contains("piece") && chessboard) {
+            console.log("You have found a piece!")
+            const gridX = Math.floor((e.clientX - chessboard.offsetLeft)/100);
+            const gridY = Math.abs(Math.ceil((e.clientY - chessboard.offsetTop-800)/100));
+            setGridX(gridX);
+            setGridY(gridY);
+            var x = e.clientX - 50;
+            var y = e.clientY - 50;
+            element.style.position = "absolute";
+            element.style.left = `${x}px`;
+            element.style.top = `${y}px`;
+            movePiece(element)
+        } 
+
+    }
+
+    function move(e) {
+        const chessboard = board_ref.current;
+        if (picked_piece && chessboard) {
+            const minX = chessboard.offsetLeft - 25;
+            const minY = chessboard.offsetTop - 25;
+            const maxX = chessboard.offsetLeft + chessboard.clientWidth - 75;
+            const maxY = chessboard.offsetTop + chessboard.clientHeight - 75;
+            const x = e.clientX - 50;
+            const y = e.clientY - 50;
+            picked_piece.style.position = "absolute";
+
+            //If x is smaller than minimum amount
+            if (x < minX) {
+                picked_piece.style.left = `${minX}px`;
+            }
+            //If x is bigger than maximum amount
+            else if (x > maxX) {
+                picked_piece.style.left = `${maxX}px`;
+            }
+            //If x is in the constraints
+            else {
+                picked_piece.style.left = `${x}px`;
+            }
+
+            //If y is smaller than minimum amount
+            if (y < minY) {
+                picked_piece.style.top = `${minY}px`;
+            }
+            //If y is bigger than maximum amount
+            else if (y > maxY) {
+                picked_piece.style.top = `${maxY}px`;
+            }
+            //If y is in the constraints
+            else {
+                picked_piece.style.top = `${y}px`;
+            }
+        }
+ 
+    }
+
+    function drop(e) {
+        const chessboard = board_ref.current;
+        if (picked_piece && chessboard) {
+            const x = Math.floor((e.clientX - chessboard.offsetLeft)/100);
+            const y = Math.abs(Math.ceil((e.clientY - chessboard.offsetTop-800)/100));
+            setPieces((value) => {
+                const pieces = value.map((p) => {
+                    if (p.x === gridX && p.y === gridY) {
+                        const check_move = game.checkMove(gridX, gridY, x, y, p.piece, p.color, value);
+                        if (check_move) {
+                            p.x = x;
+                            p.y = y;
+                        } else {
+                            picked_piece.style.position = 'relative';
+                            picked_piece.style.removeProperty('top');
+                            picked_piece.style.removeProperty('left');
+                        }
+                    }
+                    return p;
+                })
+                return pieces;
+            })
+            movePiece(null);
         }
     }
 
-    // return board
+        
+    var grid = [];
+
+    for (var i=len-1; i>=0; i--) { // Number = ROW
+        for (var j=0; j<len; j++) { // Letter = COL
+            // let position = cols[j].concat("",rows[i].toString())
+            var n = i + j + 2;
+            var piece_img = undefined
+            
+            piece_positions.forEach((p)=> {
+                if (p.x === j && p.y === i) {
+                    piece_img = p.image;
+                }
+            })
+            grid.push(<Square key={`${j},${i}`} color={n} image={piece_img}/>)
+        }
+    }
+    // console.log(grid);
     return (
         <div 
-            onMouseMove={e=> move(e)} 
-            onMouseDown={e=> pick(e)}
-            onMouseUp={e=> drop(e)} 
+            onMouseMove={(e)=> move(e)} 
+            onMouseDown={(e)=> pick(e)}
+            onMouseUp={(e)=> drop(e)} 
+            ref={board_ref}
             id="grid">
             {grid}
         </div>
