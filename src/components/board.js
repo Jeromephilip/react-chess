@@ -9,7 +9,6 @@ import Game from  './../game/game';
 // const cols = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
 const len = 8;
 
-
 var piece_positions = []
 
 for (var i=0; i < 8; i++) {
@@ -45,11 +44,27 @@ function Board() {
     const board_ref = useRef(null);
     const game = new Game();
 
+    var grid = [];
+
+    for (var i=len-1; i>=0; i--) { // Number = ROW
+        for (var j=0; j<len; j++) { // Letter = COL
+            // let position = cols[j].concat("",rows[i].toString())
+            var n = i + j + 2;
+            var piece_img = undefined
+            
+            piece_positions.forEach((p)=> {
+                if (p.x === j && p.y === i) {
+                    piece_img = p.image;
+                }
+            })
+            grid.push(<Square key={`${j},${i}`} color={n} image={piece_img}/>)
+        }
+    }
+
     function pick(e) {
         var element = e.target
         const chessboard = board_ref.current;
         if (element.classList.contains("piece") && chessboard) {
-            console.log("You have found a piece!")
             const gridX = Math.floor((e.clientX - chessboard.offsetLeft)/100);
             const gridY = Math.abs(Math.ceil((e.clientY - chessboard.offsetTop-800)/100));
             setGridX(gridX);
@@ -109,50 +124,44 @@ function Board() {
         if (picked_piece && chessboard) {
             const x = Math.floor((e.clientX - chessboard.offsetLeft)/100);
             const y = Math.abs(Math.ceil((e.clientY - chessboard.offsetTop-800)/100));
-            setPieces((value) => {
-                const pieces = value.map((p) => {
-                    if (p.x === gridX && p.y === gridY) {
-                        const check_move = game.checkMove(gridX, gridY, x, y, p.piece, p.color, value);
-                        if (check_move) {
-                            p.x = x;
-                            p.y = y;
-                        } else {
-                            picked_piece.style.position = 'relative';
-                            picked_piece.style.removeProperty('top');
-                            picked_piece.style.removeProperty('left');
+
+            const currentPiece = pieces.find((p) => p.x === gridX && p.y === gridY);
+            // const attackedPiece = pieces.find((p) => p.x === x && p.y === y);
+
+            if (currentPiece) {
+                const validMove = game.checkMove(gridX, gridY, x, y, currentPiece.piece, currentPiece.color, pieces);
+                if (validMove) {
+                    // use filter
+                    const updatedPieces = pieces.reduce((results, piece) => {
+                        if (piece.x === gridX && piece.y === gridY) {
+                            piece.x = x;
+                            piece.y = y;
+                            results.push(piece);
+                        } else if (!(piece.x === x && piece.y === y)) {
+                            results.push(piece);
                         }
-                    }
-                    return p;
-                })
-                return pieces;
-            })
+                        // console.log(results);
+                        return results;
+                    }, []);
+                    setPieces(updatedPieces);
+                    console.log(pieces);
+                } else {
+                    picked_piece.style.position = 'relative';
+                    picked_piece.style.removeProperty('top');
+                    picked_piece.style.removeProperty('left');
+                }
+            }
             movePiece(null);
         }
     }
 
-        
-    var grid = [];
-
-    for (var i=len-1; i>=0; i--) { // Number = ROW
-        for (var j=0; j<len; j++) { // Letter = COL
-            // let position = cols[j].concat("",rows[i].toString())
-            var n = i + j + 2;
-            var piece_img = undefined
-            
-            piece_positions.forEach((p)=> {
-                if (p.x === j && p.y === i) {
-                    piece_img = p.image;
-                }
-            })
-            grid.push(<Square key={`${j},${i}`} color={n} image={piece_img}/>)
-        }
-    }
+    
     // console.log(grid);
     return (
         <div 
-            onMouseMove={(e)=> move(e)} 
             onMouseDown={(e)=> pick(e)}
-            onMouseUp={(e)=> drop(e)} 
+            onMouseMove={(e)=> move(e)} 
+            onMouseUp={(e)=>drop(e)} 
             ref={board_ref}
             id="grid">
             {grid}
