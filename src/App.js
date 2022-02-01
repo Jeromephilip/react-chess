@@ -4,6 +4,7 @@ import Board from './components/board.js'
 
 function App() {
 
+// app component
   return (
     <div className="App">
       {/* <h1 className="title">Chess Game</h1> */}
